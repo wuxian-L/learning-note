@@ -1,0 +1,210 @@
+1.字符相关函数
+#incldue <cctype>
+isalnum(c)  字母或数字      isalnum('A')=1, isalnum('3')=1, isalnum('@')=0
+isalpha(c)  字母            isalpha('A')=1, isalpha('3')=0
+isdigit(c)  十进制数字      isdigit('5')=1, isdigit('a')=0
+isxdigit(c) 十六进制数字    isxdigit('F')=1, isxdigit('G')=0
+islower(c)  小写字母        islower('a')=1, islower('A')=0
+isupper(c)  大写字母        isupper('A')=1, isupper('a')=0
+isspace(c)  空白字符        isspace(' ')=1, isspace('A')=0
+isprint(c)  可打印字符      isprint('A')=1, isprint('\n')=0
+isgraph(c)  图形字符        isgraph('A')=1, isgraph(' ')=0
+ispunct(c)  标点符号        ispunct('.')=1, ispunct('A')=0
+iscntrl(c)  控制字符        iscntrl('\n')=1, iscntrl('A')=0
+tolower(c)  转小写          tolower('A')='a'
+toupper(c)  转大写          toupper('a')='A'
+2.自定义哈希函数哈希表
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        auto arrayHash = [fn = hash<uint8_t>{}] (const array<uint8_t, 26>& arr) -> size_t {
+            return accumulate(arr.begin(), arr.end(), 0u, [&](size_t acc, uint8_t num) {
+                return (acc << 1) ^ fn(num);
+            });
+        };
+
+        vector<vector<string>> ans;
+        unordered_map<array<uint8_t, 26>, size_t, decltype(arrayHash)> mp(0, arrayHash);
+        for (string& str: strs) {
+            array<uint8_t, 26> counts{};
+            uint8_t length = str.length();
+            for (uint8_t i = 0; i < length; ++i) {
+                counts[str[i] - 'a'] ++;
+            }
+            size_t idx;
+            if (mp.count(counts)) {
+                idx = mp[counts];
+            } else {
+                idx = ans.size();
+                ans.push_back(vector<string>());
+                mp[counts] = idx;
+            }
+            ans[idx].push_back(str);
+        }
+        return ans;
+    }
+};
+auto arrayHash = [fn = hash<uint8_t>{}] (const array<uint8_t, 26>& arr) -> size_t {
+            return accumulate(arr.begin(), arr.end(), 0u, [&](size_t acc, uint8_t num) {
+                return (acc << 1) ^ fn(num);
+            });
+        };
+[fn = hash<uint8_t>{}]
+//捕获
+// 意思是：我准备一个工具，叫 fn
+// 这个工具是：hash<uint8_t>{}（一个能计算数字哈希的工具）
+
+hash<uint8_t>{}是C++标准库的数字哈希计算器
+hash<uint8_t> calculator;  // 创建计算器
+size_t result = calculator(5);  // 计算数字5的哈希值
+
+(const array<uint8_t, 26>& arr)
+// 意思是：这个工具接收一个参数
+// 参数类型：26个数字的数组
+// const &: 只读引用（不拷贝，高效）
+
+-> size_t
+// 意思是：这个工具会返回一个数字（size_t）
+// 这个数字就是"篮子编号"
+
+accumulate(起点, 终点, 初始值, 混合函数)
+// 1. arr.begin(): 从篮子第一个位置开始
+// 2. arr.end(): 到篮子最后一个位置结束
+// 3. 0u: 初始编号是0
+// 4. [&](size_t acc, uint8_t num) { ... }: 如何混合
+
+// 假设处理第3个位置（数值=2）
+fn(num)           // 1. 用(fn)计算数字2，得到哈希值H
+(acc << 1)        // 2. 把当前临时编号左移1位（相当于×2）
+(acc << 1) ^ fn(num)  // 3. 用XOR（异或）混合
+
+
+unordered_map<array<uint8_t, 26>, size_t, decltype(arrayHash)> mp(0, arrayHash);
+键类型：array<uint8_t, 26>
+表示字母计数数组
+例如："eat"、"tea"、"ate" 都有相同的计数数组
+
+值类型：size_t
+存储该组在 ans中的索引
+
+哈希函数类型：decltype(arrayHash)
+decltype获取 arrayHash的类型
+让 unordered_map知道使用哪个哈希函数
+
+构造函数参数：(0, arrayHash)
+0：初始桶数
+arrayHash：传入自定义哈希函数实例
+
+3.滑动窗口
+滑动窗口的长度k不一定有用，可以优化
+滑动过程中只统计窗口，不裁剪窗口，很大优化
+
+4.牛顿迭代法求解方程解（零点）
+
+5.前缀和
+prefixsum[i]是否包含nums[i]?一般不包含，方便表示无前缀
+子数组是否能为空，决定prefixsum[sum]++;在什么位置
+
+6.lambda表达式——匿名函数
+
+[&]                         捕获子句：以引用方式捕获外部变量
+(TreeNode* node)           参数列表：接受一个TreeNode*参数
+{ ... }                    函数体
+
+[&]     以引用方式捕获所有外部变量   [&](){ x++; }
+[=]     以值方式捕获所有外部变量     [=](){ return x; }
+[x, &y] 以值捕获x，引用捕获y        [x, &y](){ y = x; }
+[this]  捕获当前类的this指针        [this](){ func(); }
+[]      不捕获任何变量              [](){ return 42; }
+
+function<void(TreeNode*)> dfs;//可以先声明，再定义
+dfs = [&](TreeNode* node){
+    if(node == nullptr){
+        return;
+    }
+    dfs(node->left);
+    if(prev != nullptr && prev->val >= node->val){
+        isValid = false;
+        return;
+    }
+    prev = node;
+    dfs(node->right);
+};
+//C++20 
+//this表示这是一个显式对象参数,指明是自身  
+//&&万能引用    
+//auto自动推导类型
+auto dfs = [&](this auto&& self, TreeNode* node) -> void {
+    if(!node) return;
+    self(node->left);
+    if(prev && prev->val >= node->val) {
+        isValid = false;
+        return;
+    }
+    prev = node;
+    self(node->right);
+};
+dfs(root);
+
+7.快慢指针
+方法	循环条件	                     fast停止位置	    slow最终位置
+偏左	fast->next && fast->next->next	倒数第2个或末尾	    偏左中点
+偏右	fast && fast->next	            末尾或nullptr	    偏右中点
+
+8.回溯
+void backtrack(vector<int>& path,vector<vector<int>>& res,vector<int>& nums,int start,int k){
+        /******  截止条件，即“树深”     ******/
+        if(path.size() == k){
+            res.push_back(path);
+            return;
+        }
+        /****** 分支个数，即“树宽”      *******/
+        for(int i =start;i < nums.size();i++){
+            path.push_back(nums[i]);//组合不考虑顺序，所以不交换，直接固定第一个数
+            backtrack(path,res,nums,i + 1,k);
+            path.pop_back();
+        }
+        /*排列，考虑顺序
+            swap(nums[i],nums[first]);//交换，固定第一（first）个数
+            backtrack(res,nums,first + 1,len);//递归，固定下一个数
+            swap(nums[i],nums[first]);//回退，恢复原数组
+        */
+    }
+
+9.哈希表 + 双向链表
+哈希表提供查询效率
+链表提供有序
+hash<int,ListNode*>
+ListNode* head，tail
+查询直接通过hash表定位节点地址，无需遍历链表
+函数维护双向链表
+    void addToHead(DLinkedNode* node){
+        node->prev = head;
+        node->next = head->next;
+        head->next->prev = node;
+        head->next = node;
+    }
+    void removeNode(DLinkedNode* node){
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+    void moveToHead(DLinkedNode* node){
+        removeNode(node);
+        addToHead(node);
+    }
+    DLinkedNode* removeTail(){
+        DLinkedNode* node = tail->prev;
+        removeNode(node);
+        return node;
+    }
+
+10.优先队列
+priority_queue<                      // 1. 模板类：优先队列
+    pair<int, int>,                  // 2. 存储的元素类型：int-int 对
+    vector<pair<int, int>>,          // 3. 底层容器：vector
+    decltype(cmp)                    // 4. 比较器类型：推导 lambda 的类型
+> q(cmp);   
+模板参数 比较器类型可以是：函数指针 、 lambada函数 、 结构体类重载 、 标准库函数如greater<int>
+构造函数q(&cmp)，需要传递比较器 q(cmp)也可以，隐式转换为函数指针
+priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(&cmp)> q(cmp);
+priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(lambdacmp)> q(labcmp);

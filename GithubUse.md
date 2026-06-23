@@ -1,6 +1,7 @@
 # 配置
 - git config --global user.name "wuxian-L"
 - git config --global user.email [邮箱]
+- .gitignore文件 包含在其中的文件地址不会被git跟踪
 # 基础操作
 - git init 初始化
 - git status 查看当前状态

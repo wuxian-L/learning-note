@@ -21,6 +21,12 @@
 ## 计划模式
 讨论并确定计划
 # claude机制
+## CLAUDE.md
+CLAUDE.md 文件，默认提示词
+
+可以在其中编辑想要Claude默认遵守的规则
+
+调用方式：对话时@CLAUDE.md,后续不用再@
 ## Skills
 ## Agents
 ## Plugins

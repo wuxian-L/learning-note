@@ -15,6 +15,10 @@
 - git remote add origin [仓库链接]            添加地址
 - git push origin master                     寄出快递
 
+- git rm 从Git管理中删除文件/目录
+- --cached 只操作Git的暂存区，不动工作区
+- -r 递归处理 删除目录时必须加
+- git rm -r --cached secret git删除暂存区secret/停止跟踪secret
 
 - git log 查看先前版本
 - echo "[文件内容]" > [文件名]
